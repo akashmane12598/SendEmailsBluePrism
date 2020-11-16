@@ -1,0 +1,140 @@
+﻿<process name="SendHTMLBodyEmail" version="1.0" bpversion="6.9.0.26970" narrative="" byrefcollection="true" type="object" runmode="Exclusive" preferredid="7664a99c-0c1b-4f39-9b5c-858e386f3f5b">
+  <appdef>
+    <element name="Application Root">
+      <id>26ed320f-c64c-4383-8ae4-3bfefdfeb4fb</id>
+      <type>Application</type>
+      <basetype>Application</basetype>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>21</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <stage stageid="e4676ec5-12e1-4bfa-84ad-c1a2e1e065ec" name="SendHTMLBodyEmail" type="SubSheetInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="c0e6b733-19ab-435a-89a6-2481cb5102d7" name="Start" type="Start">
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>c6152d13-59a6-41bf-a369-49aae0c29068</onsuccess>
+  </stage>
+  <stage stageid="0da9ca03-5b6a-498c-bacc-213f064f4379" name="End" type="End">
+    <loginhibit />
+    <display x="15" y="105" />
+  </stage>
+  <stage stageid="d0592713-72d0-4734-87f0-ab60d141da20" name="InputData" type="Collection">
+    <loginhibit />
+    <display x="120" y="-15" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="ID" type="number" />
+      <field name="Name" type="text" />
+      <field name="Age" type="number" />
+    </collectioninfo>
+    <initialvalue>
+      <row>
+        <field name="ID" type="number" value="10" />
+        <field name="Name" type="text" value="Akash" />
+        <field name="Age" type="number" value="22" />
+      </row>
+      <row>
+        <field name="ID" type="number" value="20" />
+        <field name="Name" type="text" value="Yash" />
+        <field name="Age" type="number" value="15" />
+      </row>
+      <row>
+        <field name="ID" type="number" value="30" />
+        <field name="Name" type="text" value="Tanmay" />
+        <field name="Age" type="number" value="23" />
+      </row>
+    </initialvalue>
+  </stage>
+  <stage stageid="1c8c2405-8686-4d3a-918f-e1399f9afcce" name="OutPutEmail" type="Data">
+    <display x="120" y="30" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="c6152d13-59a6-41bf-a369-49aae0c29068" name="GenerateHTMLBody" type="Code">
+    <loginhibit />
+    <display x="15" y="-45" />
+    <inputs>
+      <input type="collection" name="InputData" expr="[InputData]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="OutPutEmail" stage="OutPutEmail" />
+    </outputs>
+    <onsuccess>d028bee0-c391-4f66-9c3e-2dce92699bdf</onsuccess>
+    <code><![CDATA[StringBuilder sb=new StringBuilder();
+if(InputData.Rows.Count>0)
+{
+	sb.Append("Hi Viewer, <br><br>");
+	sb.Append("Please find the below mentioned employee details. <br><br>");
+	
+	sb.Append("<table>");
+	sb.Append("<tr>");
+	foreach(DataColumn dc in InputData.Columns)
+	{
+		sb.Append("<th>");
+		sb.Append(dc.ColumnName);
+		sb.Append("<th>");
+	}
+	sb.Append("</tr>");
+	
+	foreach(DataRow dr in InputData.Rows)
+	{
+		sb.Append("<tr>");
+		foreach(DataColumn dc in InputData.Columns)
+		{
+			sb.Append("<td>");
+			sb.Append(dr[dc.ColumnName].ToString());
+			sb.Append("</td>");
+		}
+		sb.Append("</tr>");
+	}
+	sb.Append("</table><br><br>");
+	sb.Append("Regards, <br>Team QueryBot");
+}
+OutPutEmail=sb.ToString();
+
+]]></code>
+  </stage>
+  <stage stageid="d028bee0-c391-4f66-9c3e-2dce92699bdf" name="Email - POP3/SMTP configure" type="Action">
+    <loginhibit onsuccess="true" />
+    <display x="15" y="0" />
+    <inputs>
+      <input type="text" name="Username" friendlyname="Username" narrative="The POP3 and SMTP Username" expr="[Email]" />
+      <input type="password" name="Password" friendlyname="Password" narrative="The POP3 and SMTP Password" expr="[password]" />
+      <input type="text" name="POP3 Server" friendlyname="POP3 Server" narrative="The POP3 Server address e.g. pop.domain.com" expr="&quot;pop.gmail.com&quot;" />
+      <input type="text" name="SMTP Server" friendlyname="SMTP Server" narrative="The SMTP Server address e.g. smtp.domain.com" expr="&quot;smtp.gmail.com&quot;" />
+      <input type="number" name="POP3 Port" friendlyname="POP3 Port" narrative="The POP3 Port, e.g. 110 or 995" expr="995" />
+      <input type="number" name="SMTP Port" friendlyname="SMTP Port" narrative="The SMTP Port, e.g 25 or 465" expr="587" />
+      <input type="flag" name="POP3 UseSSL" friendlyname="POP3 UseSSL" narrative="Whether to use SSL for POP3" expr="True" />
+      <input type="flag" name="SMTP UseSSL" friendlyname="SMTP UseSSL" narrative="Whether to use SSL for SMTP" expr="True" />
+    </inputs>
+    <onsuccess>d57fcf0b-3296-41f1-bf66-f4ca44312c57</onsuccess>
+    <resource object="Email - POP3/SMTP" action="Configure" />
+  </stage>
+  <stage stageid="d57fcf0b-3296-41f1-bf66-f4ca44312c57" name="Email - POP3/SMTP message" type="Action">
+    <loginhibit onsuccess="true" />
+    <display x="15" y="45" />
+    <inputs>
+      <input type="text" name="From" friendlyname="From" narrative="The email address of the sender." expr="[Email]" />
+      <input type="text" name="To" friendlyname="To" narrative="The email address of the recipient. To address multiple recipients use the format &quot;john.smith@example.com, henry.jones@example.com&quot; OR &quot;John Smith &lt;john.smith@example.com&gt;, Henry Jones &lt;henry.jones@example.com&gt;&quot;." expr="[Email]" />
+      <input type="text" name="Subject" friendlyname="Subject" narrative="The subject of the email." expr="&quot;Attachments Below&quot;" />
+      <input type="text" name="Body" friendlyname="Body" narrative="The body of the email." expr="[OutPutEmail]" />
+      <input type="collection" name="Attachments" friendlyname="Attachments" narrative="A Collection containing a list of files to add to the email as attachments." expr="" />
+      <input type="flag" name="BodyIsHTML" friendlyname="BodyIsHTML" narrative="Indicates if the body should be sent as HTML" expr="True" />
+    </inputs>
+    <onsuccess>0da9ca03-5b6a-498c-bacc-213f064f4379</onsuccess>
+    <resource object="Email - POP3/SMTP" action="Send Message" />
+  </stage>
+</process>
